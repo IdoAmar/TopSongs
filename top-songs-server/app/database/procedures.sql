@@ -1,4 +1,4 @@
-CREATE PROCEDURE public.create_user(username VARCHAR(25), password VARCHAR(75))
+CREATE OR REPLACE PROCEDURE public.create_user(username VARCHAR(25), password VARCHAR(75))
 LANGUAGE 'plpgsql'
 AS $BODY$
 BEGIN
@@ -9,7 +9,7 @@ $BODY$;
 
 
 
-CREATE PROCEDURE public.create_song(creator_user_id uuid, song_name VARCHAR(35), artist VARCHAR(20))
+CREATE OR REPLACE PROCEDURE public.create_song(creator_user_id uuid, song_name VARCHAR(35), artist VARCHAR(20))
 LANGUAGE 'plpgsql'
 AS $BODY$
 DECLARE 
@@ -40,7 +40,7 @@ $BODY$;
 
 
 
-CREATE PROCEDURE public.user_upvoted_a_song(user_id uuid, song_name VARCHAR(35), artist VARCHAR(20))
+CREATE OR REPLACE PROCEDURE public.user_upvoted_a_song(user_id uuid, song_name VARCHAR(35), artist VARCHAR(20))
 LANGUAGE 'plpgsql'
 AS $BODY$
 DECLARE 
@@ -107,3 +107,39 @@ ELSE
 END IF;
 END
 $BODY$;
+
+
+CREATE OR REPLACE FUNCTION get_all_songs_for_user(user_id uuid)
+RETURNS TABLE(
+	song_name VARCHAR(35),
+	artist VARCHAR(20),
+	upvotes INT,
+	is_created_by_user BOOLEAN,
+	is_liked_by_user BOOLEAN
+)
+AS $BODY$
+BEGIN
+RETURN QUERY SELECT 
+	songs.song_name,
+	songs.artist, songs.upvotes,
+	get_all_songs_for_user.user_id = songs.creator_user_id, 
+	ups.user_id IS NOT NULL
+FROM songs 
+LEFT JOIN user_upvoted_songs AS ups
+ON ups.user_id = get_all_songs_for_user.user_id AND songs.song_name = ups.song_name AND songs.artist = ups.artist;
+END;
+$BODY$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION check_for_login(username VARCHAR(25), password VARCHAR(75))
+RETURNS boolean
+AS $BODY$
+BEGIN
+RETURN EXISTS(
+	SELECT * 
+	FROM users 
+	WHERE 
+		users.username = check_for_login.username AND
+		users.password = check_for_login.password);
+END;
+$BODY$ LANGUAGE plpgsql;
