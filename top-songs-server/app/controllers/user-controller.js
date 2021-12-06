@@ -1,5 +1,8 @@
 const express = require('express');
+const uuid = require('uuid')
 const router = express.Router();
+const db = require('../db-config/database');
+
 
 router.get('/', (req, res) => {
     res.status(500);
@@ -12,8 +15,15 @@ router.get('/check-for-password/:id/:password', (req, res) => {
 });
 
 router.post('/create-user', (req, res) =>{
-    res.status(500);
-    res.send(`Create user not implemented with body : ${JSON.stringify(req.body)}`)
+    db.query('CALL create_user(:username, :password)', { replacements: {
+        username: req.body.username,
+        password: req.body.password
+    }}).then( r => {
+        console.log(r);
+        res.send(`Create user not implemented with body : ${JSON.stringify(req.body)}`)
+    }).catch( e => {
+        res.sendStatus(500);
+    });
 });
 
 module.exports = router;
