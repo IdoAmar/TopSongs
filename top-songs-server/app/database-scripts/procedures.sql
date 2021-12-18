@@ -129,17 +129,3 @@ LEFT JOIN user_upvoted_songs AS ups
 ON ups.user_id = get_all_songs_for_user.user_id AND songs.song_name = ups.song_name AND songs.artist = ups.artist;
 END;
 $BODY$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION check_for_login(username VARCHAR(25), password VARCHAR(75))
-RETURNS boolean
-AS $BODY$
-BEGIN
-RETURN EXISTS(
-	SELECT * 
-	FROM users 
-	WHERE 
-		users.username = check_for_login.username AND
-		users.password = check_for_login.password);
-END;
-$BODY$ LANGUAGE plpgsql;

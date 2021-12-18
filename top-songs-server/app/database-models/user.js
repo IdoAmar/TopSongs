@@ -1,9 +1,10 @@
 const Sequelize = require('sequelize');
 const db = require('../db-config/database');
 
-const User = db.define('song', {
-    uuid:{
-        type: Sequelize.UUIDV4
+const User = db.define('user', {
+    user_id:{
+        type: Sequelize.UUIDV4,
+        primaryKey: true,
     },
     username:{
         type: Sequelize.STRING
@@ -11,4 +12,6 @@ const User = db.define('song', {
     password:{
         type: Sequelize.STRING
     },
-})
+});
+
+module.exports = User;

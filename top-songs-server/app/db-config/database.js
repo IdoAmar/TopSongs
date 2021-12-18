@@ -7,5 +7,8 @@ module.exports =  new Sequelize('topsongs', 'postgres', '123456',{
         acquire: 30000,
         idle: 10000
     },
-    dialect: 'postgres'
+    dialect: 'postgres',
+    define: {
+        timestamps: false
+    }
 })
